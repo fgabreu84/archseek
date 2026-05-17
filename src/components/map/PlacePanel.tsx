@@ -10,14 +10,17 @@ interface PlacePanelProps {
 }
 
 const CATEGORY_LABELS: Record<PlaceCategory, string> = {
-  religious: 'Religious',
-  museum: 'Museum',
-  residential: 'Residential',
-  commercial: 'Commercial',
-  public: 'Public',
+  art_installation: 'Art Installation',
   bridge: 'Bridge',
+  commercial: 'Commercial',
+  landmark: 'Landmark',
   landscape: 'Landscape',
+  museum: 'Museum',
+  office: 'Office',
   other: 'Other',
+  public: 'Public',
+  religious: 'Religious',
+  residential: 'Residential',
 }
 
 export default function PlacePanel({ place, isLocked, onClose }: PlacePanelProps) {
