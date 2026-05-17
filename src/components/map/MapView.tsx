@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useRef, useState, useMemo } from 'react'
-import Map, { Marker, NavigationControl, ScaleControl } from 'react-map-gl/mapbox'
+import Map, { Marker, ScaleControl } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import type { Place, Collection, PlaceCategory } from '@/types'
 import PlacePin, { CATEGORY_COLORS } from './PlacePin'
@@ -41,6 +41,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
   const [activeCollection, setActiveCollection] = useState<string | 'all'>('all')
   const [searchQ, setSearchQ] = useState('')
   const [isLocating, setIsLocating] = useState(false)
+  const [userLocation, setUserLocation] = useState<{ longitude: number; latitude: number } | null>(null)
 
   const availableCategories = useMemo(() => {
     const set = new Set(places.map((p) => p.category))
@@ -121,6 +122,8 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
     setIsLocating(true)
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
+        const loc = { longitude: coords.longitude, latitude: coords.latitude }
+        setUserLocation(loc)
         mapRef.current?.flyTo({ center: [coords.longitude, coords.latitude], zoom: 13, duration: 1200 })
         setIsLocating(false)
       },
@@ -132,15 +135,69 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
   const chip = (active: boolean) =>
     `flex-shrink-0 text-[10px] tracking-wider uppercase px-2.5 py-1 rounded border cursor-pointer transition-colors whitespace-nowrap ${
       active
-        ? 'bg-amber-400 border-amber-400 text-stone-950 font-medium'
-        : 'border-stone-700 text-stone-400 hover:border-stone-500'
+        ? 'bg-stone-500 border-stone-500 text-white font-medium'
+        : 'border-stone-300 text-stone-500 hover:border-stone-400'
     }`
 
+  const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
+    <>
+      <div className="px-3 py-2 border-b border-stone-200">
+        <input
+          type="text"
+          value={searchQ}
+          onChange={(e) => setSearchQ(e.target.value)}
+          placeholder={mobile ? 'Buscar...' : 'Buscar lugar...'}
+          className="w-full bg-white border border-stone-300 rounded px-3 py-1.5 text-xs text-stone-700 placeholder-stone-400 outline-none focus:border-stone-400"
+        />
+      </div>
+      <div className="px-3 py-1.5 border-b border-stone-200">
+        <span className="text-[9px] tracking-widest uppercase text-stone-400">
+          {filteredPlaces.length} lugar{filteredPlaces.length !== 1 ? 'es' : ''}
+        </span>
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        {(Object.keys(sidebarGroups) as PlaceCategory[]).map((cat) => (
+          <div key={cat}>
+            <div className="px-3 py-1.5 text-[9px] tracking-widest uppercase text-stone-400 border-b border-stone-200">
+              {CATEGORY_LABELS[cat]}
+            </div>
+            {sidebarGroups[cat]!.map((place) => {
+              const col = collections.find((c) => c.id === place.collection_id)
+              const isLocked = !isAdmin && !purchasedCollectionIds.includes(place.collection_id)
+              return (
+                <button
+                  key={place.id}
+                  onClick={() => handleSidebarPlaceClick(place)}
+                  className={`w-full flex items-center gap-2 px-3 py-2 border-b border-stone-200 hover:bg-stone-100 transition-colors text-left ${
+                    selectedPlace?.id === place.id ? 'bg-stone-100' : ''
+                  }`}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{ background: isLocked ? '#d1d5db' : CATEGORY_COLORS[cat] }}
+                  />
+                  <span className={`text-xs flex-1 truncate ${isLocked ? 'text-stone-400' : 'text-stone-700'}`}>
+                    {place.name}
+                  </span>
+                  {!mobile && col && (
+                    <span className="text-[9px] text-stone-400 flex-shrink-0">
+                      {col.city}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        ))}
+      </div>
+    </>
+  )
+
   return (
-    <div className="flex flex-col w-full h-full bg-stone-950">
+    <div className="flex flex-col w-full h-full bg-white">
 
       {/* Sub-header: tabs + filters */}
-      <div className="flex-shrink-0 bg-stone-950 border-b border-stone-800 z-20">
+      <div className="flex-shrink-0 bg-stone-100 border-b border-stone-200 z-20">
         <div className="flex items-center gap-0 px-3 pt-2">
           {(['map', 'places'] as const).map((tab) => (
             <button
@@ -148,8 +205,8 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
               onClick={() => setViewTab(tab)}
               className={`px-4 py-1.5 text-[11px] tracking-widest uppercase border-b-2 transition-colors ${
                 viewTab === tab
-                  ? 'border-amber-400 text-amber-400'
-                  : 'border-transparent text-stone-500 hover:text-stone-300'
+                  ? 'border-stone-700 text-stone-900'
+                  : 'border-transparent text-stone-400 hover:text-stone-700'
               }`}
             >
               {tab === 'map' ? 'Mapa' : 'Places'}
@@ -204,62 +261,14 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
         {viewTab === 'map' && (
           <>
             {/* Desktop sidebar */}
-            <aside className="hidden sm:flex w-72 flex-shrink-0 flex-col bg-stone-950 border-r border-stone-800 overflow-hidden z-10">
-              <div className="px-3 py-2 border-b border-stone-800">
-                <input
-                  type="text"
-                  value={searchQ}
-                  onChange={(e) => setSearchQ(e.target.value)}
-                  placeholder="Buscar lugar..."
-                  className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-1.5 text-xs text-stone-200 placeholder-stone-500 outline-none focus:border-stone-500"
-                />
-              </div>
-              <div className="px-3 py-1.5 border-b border-stone-800">
-                <span className="text-[9px] tracking-widest uppercase text-stone-500">
-                  {filteredPlaces.length} lugar{filteredPlaces.length !== 1 ? 'es' : ''}
-                </span>
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                {(Object.keys(sidebarGroups) as PlaceCategory[]).map((cat) => (
-                  <div key={cat}>
-                    <div className="px-3 py-1.5 text-[9px] tracking-widest uppercase text-stone-500 border-b border-stone-800">
-                      {CATEGORY_LABELS[cat]}
-                    </div>
-                    {sidebarGroups[cat]!.map((place) => {
-                      const col = collections.find((c) => c.id === place.collection_id)
-                      const isLocked = !isAdmin && !purchasedCollectionIds.includes(place.collection_id)
-                      return (
-                        <button
-                          key={place.id}
-                          onClick={() => handleSidebarPlaceClick(place)}
-                          className={`w-full flex items-center gap-2 px-3 py-2 border-b border-stone-800/50 hover:bg-stone-900 transition-colors text-left ${
-                            selectedPlace?.id === place.id ? 'bg-stone-900' : ''
-                          }`}
-                        >
-                          <span
-                            className="w-2 h-2 rounded-full flex-shrink-0"
-                            style={{ background: isLocked ? '#6b7280' : CATEGORY_COLORS[cat] }}
-                          />
-                          <span className={`text-xs flex-1 truncate ${isLocked ? 'text-stone-500' : 'text-stone-300'}`}>
-                            {place.name}
-                          </span>
-                          {col && (
-                            <span className="text-[9px] text-stone-600 flex-shrink-0">
-                              {col.city}
-                            </span>
-                          )}
-                        </button>
-                      )
-                    })}
-                  </div>
-                ))}
-              </div>
+            <aside className="hidden sm:flex w-72 flex-shrink-0 flex-col bg-stone-100 border-r border-stone-200 overflow-hidden z-10">
+              <SidebarContent />
             </aside>
 
             {/* Mobile sidebar toggle button */}
             <button
               onClick={() => setSidebarOpen((o) => !o)}
-              className="sm:hidden absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-stone-900 border border-stone-700 border-l-0 rounded-r-lg w-6 h-12 flex items-center justify-center text-stone-400"
+              className="sm:hidden absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-white border border-stone-200 border-l-0 rounded-r-lg w-6 h-12 flex items-center justify-center text-stone-400"
             >
               {sidebarOpen ? '‹' : '›'}
             </button>
@@ -271,48 +280,8 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                   className="sm:hidden fixed inset-0 z-20"
                   onClick={() => setSidebarOpen(false)}
                 />
-                <aside className="sm:hidden absolute left-0 top-0 h-full w-[55vw] max-w-xs bg-stone-950 border-r border-stone-800 flex flex-col z-30 shadow-xl">
-                  <div className="px-3 py-2 border-b border-stone-800">
-                    <input
-                      type="text"
-                      value={searchQ}
-                      onChange={(e) => setSearchQ(e.target.value)}
-                      placeholder="Buscar..."
-                      className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-1.5 text-xs text-stone-200 placeholder-stone-500 outline-none"
-                    />
-                  </div>
-                  <div className="px-3 py-1 border-b border-stone-800">
-                    <span className="text-[9px] tracking-widest uppercase text-stone-500">
-                      {filteredPlaces.length} lugares
-                    </span>
-                  </div>
-                  <div className="flex-1 overflow-y-auto">
-                    {(Object.keys(sidebarGroups) as PlaceCategory[]).map((cat) => (
-                      <div key={cat}>
-                        <div className="px-3 py-1.5 text-[9px] tracking-widest uppercase text-stone-500 border-b border-stone-800">
-                          {CATEGORY_LABELS[cat]}
-                        </div>
-                        {sidebarGroups[cat]!.map((place) => {
-                          const isLocked = !isAdmin && !purchasedCollectionIds.includes(place.collection_id)
-                          return (
-                            <button
-                              key={place.id}
-                              onClick={() => handleSidebarPlaceClick(place)}
-                              className="w-full flex items-center gap-2 px-3 py-2 border-b border-stone-800/50 hover:bg-stone-900 transition-colors text-left"
-                            >
-                              <span
-                                className="w-2 h-2 rounded-full flex-shrink-0"
-                                style={{ background: isLocked ? '#6b7280' : CATEGORY_COLORS[cat] }}
-                              />
-                              <span className={`text-xs truncate ${isLocked ? 'text-stone-500' : 'text-stone-300'}`}>
-                                {place.name}
-                              </span>
-                            </button>
-                          )
-                        })}
-                      </div>
-                    ))}
-                  </div>
+                <aside className="sm:hidden absolute left-0 top-0 h-full w-[55vw] max-w-xs bg-stone-100 border-r border-stone-200 flex flex-col z-30 shadow-xl">
+                  <SidebarContent mobile />
                 </aside>
               </>
             )}
@@ -325,8 +294,8 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                 initialViewState={INITIAL_VIEW}
                 style={{ width: '100%', height: '100%' }}
                 mapStyle="mapbox://styles/mapbox/light-v11"
+                onClick={() => setSelectedPlace(null)}
               >
-                <NavigationControl position="top-right" />
                 <ScaleControl position="bottom-left" />
 
                 {filteredPlaces.map((place) => (
@@ -347,34 +316,63 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                     />
                   </Marker>
                 ))}
+
+                {/* User location dot */}
+                {userLocation && (
+                  <Marker longitude={userLocation.longitude} latitude={userLocation.latitude} anchor="center">
+                    <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow-md" />
+                  </Marker>
+                )}
               </Map>
 
-              {/* Geolocation */}
-              <button
-                onClick={handleGeolocate}
-                disabled={isLocating}
-                title="Minha localização"
-                className="absolute bottom-20 right-3 z-10 bg-white border border-neutral-300 rounded p-2 hover:bg-neutral-50 disabled:opacity-50 transition-colors shadow"
-              >
-                <svg className="w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="3" fill="currentColor" />
-                  <circle cx="12" cy="12" r="7" />
-                  <path d="M12 2v2m0 16v2M22 12h-2M4 12H2" strokeLinecap="round" />
-                </svg>
-              </button>
+              {/* Right-side controls column: legend + zoom + geolocate */}
+              <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">
 
-              {/* Legend */}
-              {availableCategories.length > 0 && (
-                <div className="absolute top-12 right-3 z-10 bg-white/95 border border-neutral-200 rounded shadow-md px-3 py-2">
-                  <div className="text-[9px] tracking-widest uppercase text-neutral-400 mb-1.5">Categorias</div>
-                  {availableCategories.map((cat) => (
-                    <div key={cat} className="flex items-center gap-1.5 py-0.5 text-[10px] text-neutral-700">
-                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLORS[cat] }} />
-                      {CATEGORY_LABELS[cat]}
-                    </div>
-                  ))}
+                {/* Legend */}
+                {availableCategories.length > 0 && (
+                  <div className="bg-white/95 border border-neutral-200 rounded shadow-sm px-3 py-2">
+                    <div className="text-[9px] tracking-widest uppercase text-neutral-400 mb-1.5">Categorias</div>
+                    {availableCategories.map((cat) => (
+                      <div key={cat} className="flex items-center gap-1.5 py-0.5 text-[10px] text-neutral-700">
+                        <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLORS[cat] }} />
+                        {CATEGORY_LABELS[cat]}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Zoom controls */}
+                <div className="flex flex-col shadow-sm border border-neutral-300 rounded overflow-hidden">
+                  <button
+                    onClick={() => mapRef.current?.zoomIn()}
+                    className="w-8 h-8 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-600 text-lg border-b border-neutral-200 transition-colors leading-none"
+                    title="Zoom in"
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={() => mapRef.current?.zoomOut()}
+                    className="w-8 h-8 bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-600 text-lg transition-colors leading-none"
+                    title="Zoom out"
+                  >
+                    −
+                  </button>
                 </div>
-              )}
+
+                {/* Geolocation */}
+                <button
+                  onClick={handleGeolocate}
+                  disabled={isLocating}
+                  title="Minha localização"
+                  className="w-8 h-8 bg-white border border-neutral-300 rounded flex items-center justify-center hover:bg-neutral-50 disabled:opacity-50 transition-colors shadow-sm"
+                >
+                  <svg className={`w-4 h-4 ${isLocating ? 'text-blue-500' : 'text-neutral-600'}`} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3" fill="currentColor" />
+                    <circle cx="12" cy="12" r="7" />
+                    <path d="M12 2v2m0 16v2M22 12h-2M4 12H2" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
 
               {/* Collection panel */}
               {activeCollection !== 'all' && selectedCollectionObj && (

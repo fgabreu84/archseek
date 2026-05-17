@@ -1,24 +1,36 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: "Helvetica Neue", "Helvetica", "Arial", system-ui, sans-serif;
+  --font-sans: "Akzidenz-Grotesk", "Akzidenz-Grotesk Pro", "AkzidenzGrotesk", "Helvetica Neue", "Helvetica", "Arial", system-ui, sans-serif;
 }
 
 html, body {
   background-color: #ffffff;
   color: #0a0a0a;
-  font-family: "Helvetica Neue", "Helvetica", "Arial", system-ui, sans-serif;
+  font-family: "Akzidenz-Grotesk", "Akzidenz-Grotesk Pro", "AkzidenzGrotesk", "Helvetica Neue", "Helvetica", "Arial", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.01em;
 }
 
-@keyframes slide-in {
+@keyframes slide-in-x {
   from { transform: translateX(100%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
 
+@keyframes slide-in-y {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Mobile: sobe de baixo. Desktop (sm+): entra pela direita */
 .animate-slide-in {
-  animation: slide-in 0.22s ease-out;
+  animation: slide-in-y 0.22s ease-out;
+}
+
+@media (min-width: 640px) {
+  .animate-slide-in {
+    animation: slide-in-x 0.22s ease-out;
+  }
 }
 
 .mapboxgl-ctrl-logo {

@@ -46,7 +46,6 @@ export default function PlacesView({
     })
   }, [places, activeCategory, activeCollection, searchQ])
 
-  // Group by category, then by collection
   const grouped = useMemo(() => {
     const cats: Record<string, { collection: Collection | undefined; places: Place[] }[]> = {}
     const catOrder: PlaceCategory[] = []
@@ -74,10 +73,17 @@ export default function PlacesView({
     return (Object.keys(CATEGORY_LABELS) as PlaceCategory[]).filter((c) => set.has(c))
   }, [places])
 
+  const chip = (active: boolean) =>
+    `flex-shrink-0 text-[10px] tracking-wider uppercase px-2.5 py-1 rounded border cursor-pointer transition-colors whitespace-nowrap ${
+      active
+        ? 'bg-stone-500 border-stone-500 text-white font-medium'
+        : 'border-stone-300 text-stone-500 hover:border-stone-400'
+    }`
+
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-stone-950">
+    <div className="flex flex-col h-full overflow-hidden bg-stone-100">
       {/* Sticky header */}
-      <div className="flex-shrink-0 border-b border-stone-800 bg-stone-950">
+      <div className="flex-shrink-0 border-b border-stone-200 bg-stone-100">
         {/* Search */}
         <div className="px-3 pt-3 pb-2">
           <input
@@ -85,31 +91,20 @@ export default function PlacesView({
             value={searchQ}
             onChange={(e) => setSearchQ(e.target.value)}
             placeholder="Buscar lugar..."
-            className="w-full bg-stone-900 border border-stone-700 rounded px-3 py-2 text-xs text-stone-200 placeholder-stone-500 outline-none focus:border-stone-500"
+            className="w-full bg-white border border-stone-300 rounded px-3 py-2 text-xs text-stone-700 placeholder-stone-400 outline-none focus:border-stone-400"
           />
         </div>
 
         {/* Category filter */}
         <div className="flex gap-1.5 px-3 pb-2 overflow-x-auto scrollbar-none">
-          <button
-            onClick={() => setActiveCategory('all')}
-            className={`flex-shrink-0 text-[10px] tracking-wider uppercase px-2.5 py-1 rounded border transition-colors ${
-              activeCategory === 'all'
-                ? 'bg-amber-400 border-amber-400 text-stone-950 font-medium'
-                : 'border-stone-700 text-stone-400 hover:border-stone-500'
-            }`}
-          >
+          <button className={chip(activeCategory === 'all')} onClick={() => setActiveCategory('all')}>
             Tudo
           </button>
           {availableCategories.map((cat) => (
             <button
               key={cat}
+              className={`${chip(activeCategory === cat)} flex items-center gap-1.5`}
               onClick={() => setActiveCategory(activeCategory === cat ? 'all' : cat)}
-              className={`flex-shrink-0 flex items-center gap-1.5 text-[10px] tracking-wider uppercase px-2.5 py-1 rounded border transition-colors ${
-                activeCategory === cat
-                  ? 'bg-stone-800 border-stone-600 text-stone-100'
-                  : 'border-stone-700 text-stone-400 hover:border-stone-500'
-              }`}
             >
               <span
                 className="w-1.5 h-1.5 rounded-full flex-shrink-0"
@@ -123,25 +118,14 @@ export default function PlacesView({
         {/* Collection filter */}
         {collections.length > 0 && (
           <div className="flex gap-1.5 px-3 pb-3 overflow-x-auto scrollbar-none">
-            <button
-              onClick={() => setActiveCollection('all')}
-              className={`flex-shrink-0 text-[10px] tracking-wider uppercase px-2.5 py-1 rounded border transition-colors ${
-                activeCollection === 'all'
-                  ? 'bg-amber-400 border-amber-400 text-stone-950 font-medium'
-                  : 'border-stone-700 text-stone-400 hover:border-stone-500'
-              }`}
-            >
+            <button className={chip(activeCollection === 'all')} onClick={() => setActiveCollection('all')}>
               Todas
             </button>
             {collections.map((col) => (
               <button
                 key={col.id}
+                className={chip(activeCollection === col.id)}
                 onClick={() => setActiveCollection(activeCollection === col.id ? 'all' : col.id)}
-                className={`flex-shrink-0 text-[10px] tracking-wider uppercase px-2.5 py-1 rounded border transition-colors whitespace-nowrap ${
-                  activeCollection === col.id
-                    ? 'bg-stone-800 border-stone-600 text-stone-100'
-                    : 'border-stone-700 text-stone-400 hover:border-stone-500'
-                }`}
               >
                 {col.city}
               </button>
@@ -150,15 +134,15 @@ export default function PlacesView({
         )}
 
         {/* Stats */}
-        <div className="px-3 pb-2 text-[9px] tracking-widest uppercase text-stone-500">
+        <div className="px-3 pb-2 text-[9px] tracking-widest uppercase text-stone-400">
           {filtered.length} lugar{filtered.length !== 1 ? 'es' : ''}
         </div>
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-white">
         {grouped.catOrder.length === 0 ? (
-          <p className="text-stone-500 text-xs text-center py-12">Nenhum lugar encontrado</p>
+          <p className="text-stone-400 text-xs text-center py-12">Nenhum lugar encontrado</p>
         ) : (
           grouped.catOrder.map((cat) => {
             const groups = grouped.cats[cat]
@@ -166,22 +150,22 @@ export default function PlacesView({
             return (
               <div key={cat} className="mb-4">
                 {/* Category header */}
-                <div className="sticky top-0 flex items-center gap-2 px-3 py-2 bg-stone-900 border-b border-stone-800 z-10">
+                <div className="sticky top-0 flex items-center gap-2 px-3 py-2 bg-stone-100 border-b border-stone-200 z-10">
                   <span
                     className="w-2 h-2 rounded-full flex-shrink-0"
                     style={{ background: CATEGORY_COLORS[cat] }}
                   />
-                  <span className="text-[10px] tracking-widest uppercase text-stone-300 flex-1">
+                  <span className="text-[10px] tracking-widest uppercase text-stone-600 flex-1">
                     {CATEGORY_LABELS[cat]}
                   </span>
-                  <span className="text-[9px] text-stone-500">{total}</span>
+                  <span className="text-[9px] text-stone-400">{total}</span>
                 </div>
 
                 {/* Sub-groups by collection */}
                 {groups.map((group, gi) => (
                   <div key={gi}>
                     {group.collection && (
-                      <div className="px-3 py-1 text-[9px] tracking-widest uppercase text-stone-500 border-b border-stone-800/50">
+                      <div className="px-3 py-1 text-[9px] tracking-widest uppercase text-stone-400 border-b border-stone-100">
                         {group.collection.city}, {group.collection.country}
                       </div>
                     )}
@@ -192,26 +176,26 @@ export default function PlacesView({
                         <button
                           key={place.id}
                           onClick={() => onSelectPlace(place)}
-                          className="w-full flex items-center justify-between gap-3 px-3 py-2.5 border-b border-stone-800/50 hover:bg-stone-900 transition-colors text-left"
+                          className="w-full flex items-center justify-between gap-3 px-3 py-2.5 border-b border-stone-100 hover:bg-stone-50 transition-colors text-left"
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <span
                               className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                              style={{ background: isLocked ? '#6b7280' : CATEGORY_COLORS[cat] }}
+                              style={{ background: isLocked ? '#d1d5db' : CATEGORY_COLORS[cat] }}
                             />
                             <span
-                              className={`text-xs truncate ${isLocked ? 'text-stone-500' : 'text-stone-200'}`}
+                              className={`text-xs truncate ${isLocked ? 'text-stone-400' : 'text-stone-700'}`}
                             >
                               {place.name}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {place.year_built && (
-                              <span className="text-[9px] text-stone-500">{place.year_built}</span>
+                              <span className="text-[9px] text-stone-400">{place.year_built}</span>
                             )}
                             {isLocked && (
                               <svg
-                                className="w-3 h-3 text-stone-600"
+                                className="w-3 h-3 text-stone-300"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
                               >
