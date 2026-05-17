@@ -25,22 +25,22 @@ const CATEGORY_LABELS: Record<PlaceCategory, string> = {
 
 export default function PlacePanel({ place, isLocked, onClose }: PlacePanelProps) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-[25%] w-full sm:bottom-auto sm:top-0 sm:right-0 sm:left-auto sm:h-full sm:w-80 bg-white border-t border-neutral-200 sm:border-t-0 sm:border-l shadow-xl flex flex-col z-30 animate-slide-in">
+    <div className="absolute bottom-0 left-0 right-0 h-[30%] w-full sm:bottom-auto sm:top-0 sm:right-0 sm:left-auto sm:h-full sm:w-80 bg-white border-t border-neutral-200 sm:border-t-0 sm:border-l shadow-xl flex flex-col z-30 animate-slide-in">
       {/* Header */}
-      <div className="flex items-start justify-between px-6 py-5 border-b border-neutral-100">
-        <div className="flex-1 pr-3">
-          <span className="text-xs text-neutral-400 uppercase tracking-widest mb-1.5 block">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-100 flex-shrink-0">
+        <div className="flex-1 pr-3 min-w-0">
+          <span className="text-[10px] text-neutral-400 uppercase tracking-widest leading-none block truncate">
             {CATEGORY_LABELS[place.category]}
             {place.collection && ` · ${place.collection.city}`}
           </span>
-          <h2 className="text-base font-medium text-neutral-900 leading-snug">{place.name}</h2>
+          <h2 className="text-sm font-medium text-neutral-900 leading-snug truncate">{place.name}</h2>
         </div>
         <button
           onClick={onClose}
-          className="text-neutral-300 hover:text-neutral-900 transition-colors flex-shrink-0 mt-0.5"
+          className="text-neutral-300 hover:text-neutral-900 transition-colors flex-shrink-0 cursor-pointer"
           aria-label="Close"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
