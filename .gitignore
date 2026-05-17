@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local files
+.claude/
+dev.log
+museus_info.md
+add_art_installation_category.sql
