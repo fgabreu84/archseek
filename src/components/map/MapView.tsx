@@ -159,55 +159,57 @@ export default function MapView({ places, purchasedCollectionIds, isAdmin }: Map
         })}
       </Map>
 
+      {/* Desktop: vertical sidebar */}
       {collections.length > 0 && (
-        <>
-          {/* Desktop: vertical sidebar */}
-          <div className="hidden sm:flex absolute top-0 left-0 h-full w-64 bg-white border-r border-neutral-200 shadow-lg flex-col z-10 overflow-hidden">
-            <div className="px-6 py-5 border-b border-neutral-100">
-              <h2 className="text-sm font-medium text-neutral-900">Collections</h2>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {collections.map((collection) => (
-                <button
-                  key={collection.id}
-                  onClick={() => handleCollectionClick(collection)}
-                  className="w-full text-left px-6 py-4 border-b border-neutral-100 hover:bg-neutral-50 transition-colors"
-                >
-                  <p className="text-xs text-neutral-400 uppercase tracking-widest mb-1">
-                    {collection.country}
-                  </p>
-                  <p className="text-sm font-medium text-neutral-900">
-                    {collection.name ?? collection.city}
-                  </p>
-                </button>
-              ))}
-            </div>
+        <div className="hidden sm:flex absolute top-0 left-0 h-full w-64 bg-white border-r border-neutral-200 shadow-lg flex-col z-10 overflow-hidden">
+          <div className="px-6 py-5 border-b border-neutral-100">
+            <h2 className="text-sm font-medium text-neutral-900">Collections</h2>
           </div>
-
-          {/* Mobile: horizontal scroll at bottom */}
-          <div className="sm:hidden absolute bottom-0 left-0 right-0 bg-white border-t border-neutral-200 shadow-lg z-10">
-            <div className="px-4 py-3 border-b border-neutral-100">
-              <h2 className="text-xs font-medium text-neutral-900 uppercase tracking-widest">Collections</h2>
-            </div>
-            <div className="overflow-x-auto flex gap-3 px-4 py-3">
-              {collections.map((collection) => (
-                <button
-                  key={collection.id}
-                  onClick={() => handleCollectionClick(collection)}
-                  className="flex-shrink-0 px-4 py-2 bg-neutral-100 rounded hover:bg-neutral-200 transition-colors"
-                >
-                  <p className="text-xs text-neutral-500 uppercase tracking-widest">
-                    {collection.country}
-                  </p>
-                  <p className="text-sm font-medium text-neutral-900 whitespace-nowrap">
-                    {collection.name ?? collection.city}
-                  </p>
-                </button>
-              ))}
-            </div>
+          <div className="flex-1 overflow-y-auto">
+            {collections.map((collection) => (
+              <button
+                key={collection.id}
+                onClick={() => handleCollectionClick(collection)}
+                className="w-full text-left px-6 py-4 border-b border-neutral-100 hover:bg-neutral-50 transition-colors"
+              >
+                <p className="text-xs text-neutral-400 uppercase tracking-widest mb-1">
+                  {collection.country}
+                </p>
+                <p className="text-sm font-medium text-neutral-900">
+                  {collection.name ?? collection.city}
+                </p>
+              </button>
+            ))}
           </div>
-        </>
+        </div>
       )}
+
+      {/* Mobile: horizontal scroll at bottom - always visible */}
+      <div className="sm:hidden absolute bottom-0 left-0 right-0 bg-white border-t border-neutral-200 shadow-lg z-10">
+        <div className="px-4 py-3 border-b border-neutral-100">
+          <h2 className="text-xs font-medium text-neutral-900 uppercase tracking-widest">Collections</h2>
+        </div>
+        {collections.length > 0 ? (
+          <div className="overflow-x-auto flex gap-3 px-4 py-3">
+            {collections.map((collection) => (
+              <button
+                key={collection.id}
+                onClick={() => handleCollectionClick(collection)}
+                className="flex-shrink-0 px-4 py-2 bg-neutral-100 rounded hover:bg-neutral-200 transition-colors"
+              >
+                <p className="text-xs text-neutral-500 uppercase tracking-widest">
+                  {collection.country}
+                </p>
+                <p className="text-sm font-medium text-neutral-900 whitespace-nowrap">
+                  {collection.name ?? collection.city}
+                </p>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-neutral-400 px-4 py-3">No collections available</p>
+        )}
+      </div>
 
       {selectedPlace && (
         <PlacePanel
