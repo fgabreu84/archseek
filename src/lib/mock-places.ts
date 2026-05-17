@@ -1,4 +1,12 @@
-import type { Place } from '@/types'
+import type { Place, Collection } from '@/types'
+
+export const MOCK_COLLECTIONS: Collection[] = [
+  { id: 'col-sp', name: 'São Paulo', city: 'São Paulo', country: 'Brasil', description: null, cover_image_url: null, price_brl: 0, stripe_price_id: null, is_published: true, created_at: new Date().toISOString() },
+  { id: 'col-rome', name: 'Roma', city: 'Roma', country: 'Itália', description: null, cover_image_url: null, price_brl: 29.9, stripe_price_id: null, is_published: true, created_at: new Date().toISOString() },
+  { id: 'col-paris', name: 'Paris', city: 'Paris', country: 'França', description: null, cover_image_url: null, price_brl: 24.9, stripe_price_id: null, is_published: true, created_at: new Date().toISOString() },
+  { id: 'col-sydney', name: 'Sydney', city: 'Sydney', country: 'Austrália', description: null, cover_image_url: null, price_brl: 19.9, stripe_price_id: null, is_published: true, created_at: new Date().toISOString() },
+  { id: 'col-tokyo', name: 'Japão', city: 'Osaka', country: 'Japão', description: null, cover_image_url: null, price_brl: 34.9, stripe_price_id: null, is_published: true, created_at: new Date().toISOString() },
+]
 
 export const MOCK_PLACES: Place[] = [
   {

@@ -8,7 +8,7 @@ interface PlacePinProps {
   isLocked: boolean
 }
 
-const CATEGORY_COLORS: Record<PlaceCategory, string> = {
+export const CATEGORY_COLORS: Record<PlaceCategory, string> = {
   art_installation: '#d946ef',
   bridge: '#14b8a6',
   commercial: '#ef4444',
@@ -24,20 +24,36 @@ const CATEGORY_COLORS: Record<PlaceCategory, string> = {
 
 export default function PlacePin({ category, isSelected, isLocked }: PlacePinProps) {
   const color = isLocked ? '#9ca3af' : CATEGORY_COLORS[category]
-  const size = isSelected ? 16 : 12
+  const r = isSelected ? 7 : 5
+  const size = r * 2 + 4
 
   return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        backgroundColor: color,
-        borderRadius: '50%',
-        border: isSelected ? '2px solid #ffffff' : 'none',
-        boxShadow: isSelected ? `0 0 0 2px ${color}` : '0 1px 3px rgba(0,0,0,0.3)',
-        transition: 'all 0.2s ease',
-        cursor: 'pointer',
-      }}
-    />
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ cursor: 'pointer', overflow: 'visible' }}
+    >
+      {isSelected && (
+        <circle
+          cx={r + 2}
+          cy={r + 2}
+          r={r + 2}
+          fill="none"
+          stroke={color}
+          strokeWidth="1.5"
+          opacity="0.4"
+        />
+      )}
+      <circle
+        cx={r + 2}
+        cy={r + 2}
+        r={r}
+        fill={color}
+        stroke="#ffffff"
+        strokeWidth="1.5"
+      />
+    </svg>
   )
 }
