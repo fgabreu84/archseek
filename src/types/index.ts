@@ -41,14 +41,17 @@ export interface Place {
 }
 
 export type PlaceCategory =
-  | 'religious'
-  | 'museum'
-  | 'residential'
-  | 'commercial'
-  | 'public'
+  | 'art_installation'
   | 'bridge'
+  | 'commercial'
+  | 'landmark'
   | 'landscape'
+  | 'museum'
+  | 'office'
   | 'other'
+  | 'public'
+  | 'religious'
+  | 'residential'
 
 export interface PlaceImage {
   id: string
