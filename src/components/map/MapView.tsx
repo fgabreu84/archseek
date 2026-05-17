@@ -160,7 +160,7 @@ export default function MapView({ places, purchasedCollectionIds, isAdmin }: Map
       </Map>
 
       {collections.length > 0 && (
-        <div className="absolute top-0 left-0 h-full w-64 bg-white border-r border-neutral-200 shadow-lg flex flex-col z-10 overflow-hidden">
+        <div className="absolute top-0 left-0 h-full w-48 sm:w-64 bg-white border-r border-neutral-200 shadow-lg flex flex-col z-10 overflow-hidden">
           <div className="px-6 py-5 border-b border-neutral-100">
             <h2 className="text-sm font-medium text-neutral-900">Collections</h2>
           </div>
