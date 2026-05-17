@@ -40,7 +40,7 @@ export default async function NewPlacePage() {
             className="w-full bg-transparent border-b border-neutral-300 pb-2 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
           >
             <option value="">Select a collection</option>
-            {collections?.map((col: Collection) => (
+            {collections?.map(col => (
               <option key={col.id} value={col.id}>{col.name ?? col.city}</option>
             ))}
           </select>
