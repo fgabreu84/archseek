@@ -168,7 +168,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                 <button
                   key={place.id}
                   onClick={() => handleSidebarPlaceClick(place)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 border-b border-stone-200 hover:bg-stone-100 transition-colors text-left ${
+                  className={`w-full flex items-center gap-2 px-3 py-2 border-b border-stone-200 hover:bg-stone-100 transition-colors text-left cursor-pointer ${
                     selectedPlace?.id === place.id ? 'bg-stone-100' : ''
                   }`}
                 >

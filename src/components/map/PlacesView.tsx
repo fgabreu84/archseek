@@ -176,7 +176,7 @@ export default function PlacesView({
                         <button
                           key={place.id}
                           onClick={() => onSelectPlace(place)}
-                          className="w-full flex items-center justify-between gap-3 px-3 py-2.5 border-b border-stone-100 hover:bg-stone-50 transition-colors text-left"
+                          className="w-full flex items-center justify-between gap-3 px-3 py-2.5 border-b border-stone-100 hover:bg-stone-50 transition-colors text-left cursor-pointer"
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <span
