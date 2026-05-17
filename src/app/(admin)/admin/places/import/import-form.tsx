@@ -40,7 +40,7 @@ function parseKML(kmlContent: string): ParsedPlace[] {
   return places
 }
 
-export default function ImportForm({ collections }: { collections: Collection[] }) {
+export default function ImportForm({ collections }: { collections: any[] }) {
   const [collectionId, setCollectionId] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<ParsedPlace[]>([])
