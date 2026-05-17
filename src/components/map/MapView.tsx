@@ -66,16 +66,6 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
     return groups
   }, [filteredPlaces])
 
-  const collectionPanelPlaces = useMemo(() => {
-    if (activeCollection === 'all') return []
-    return filteredPlaces.filter((p) => p.collection_id === activeCollection)
-  }, [filteredPlaces, activeCollection])
-
-  const selectedCollectionObj = useMemo(
-    () => collections.find((c) => c.id === activeCollection),
-    [collections, activeCollection]
-  )
-
   const flyToPlace = useCallback((place: Place) => {
     mapRef.current?.flyTo({ center: [place.longitude, place.latitude], zoom: 16, duration: 900 })
   }, [])
@@ -374,34 +364,6 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                 </button>
               </div>
 
-              {/* Collection panel */}
-              {activeCollection !== 'all' && selectedCollectionObj && (
-                <div className="absolute bottom-4 right-3 z-10 bg-white/95 border border-neutral-200 rounded shadow-lg p-3 min-w-[200px] max-w-[260px] max-h-60 flex flex-col">
-                  <div className="text-[9px] tracking-widest uppercase text-neutral-400 mb-0.5">
-                    {selectedCollectionObj.city}, {selectedCollectionObj.country}
-                  </div>
-                  <div className="text-[10px] font-medium text-neutral-600 mb-2">
-                    {collectionPanelPlaces.length} lugar{collectionPanelPlaces.length !== 1 ? 'es' : ''}
-                  </div>
-                  <div className="flex-1 overflow-y-auto space-y-0.5">
-                    {collectionPanelPlaces.map((p) => (
-                      <button
-                        key={p.id}
-                        onClick={() => handleSidebarPlaceClick(p)}
-                        className="w-full flex items-center gap-2 py-0.5 text-left group"
-                      >
-                        <span
-                          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                          style={{ background: CATEGORY_COLORS[p.category] }}
-                        />
-                        <span className="text-[10px] text-neutral-600 group-hover:text-neutral-900 truncate transition-colors">
-                          {p.name}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </>
         )}
