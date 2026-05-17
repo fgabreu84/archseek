@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useRef, useState, useEffect } from 'react'
-import Map, { Marker, NavigationControl, ScaleControl, MapRef } from 'react-map-gl'
+import Map, { Marker, NavigationControl, ScaleControl } from 'react-map-gl/mapbox'
 import { createClient } from '@/lib/supabase/client'
 import type { Collection } from '@/types'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -22,7 +22,7 @@ const INITIAL_VIEW = {
 }
 
 export default function MapView({ places, purchasedCollectionIds, isAdmin }: MapViewProps) {
-  const mapRef = useRef<MapRef>(null)
+  const mapRef = useRef<any>(null)
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
   const [isLocating, setIsLocating] = useState(false)
   const [collections, setCollections] = useState<Collection[]>([])
