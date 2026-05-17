@@ -25,7 +25,7 @@ const CATEGORY_LABELS: Record<PlaceCategory, string> = {
 
 export default function PlacePanel({ place, isLocked, onClose }: PlacePanelProps) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 h-[58%] w-full sm:bottom-auto sm:top-0 sm:right-0 sm:left-auto sm:h-full sm:w-80 bg-white border-t border-neutral-200 sm:border-t-0 sm:border-l shadow-xl flex flex-col z-30 animate-slide-in">
+    <div className="absolute bottom-0 left-0 right-0 h-[25%] w-full sm:bottom-auto sm:top-0 sm:right-0 sm:left-auto sm:h-full sm:w-80 bg-white border-t border-neutral-200 sm:border-t-0 sm:border-l shadow-xl flex flex-col z-30 animate-slide-in">
       {/* Header */}
       <div className="flex items-start justify-between px-6 py-5 border-b border-neutral-100">
         <div className="flex-1 pr-3">
