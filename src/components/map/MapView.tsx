@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 import type { Collection } from '@/types'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import type { Place } from '@/types'
-import type { MapRef } from 'react-map-gl'
 import PlacePin from './PlacePin'
 import PlacePanel from './PlacePanel'
 
@@ -23,7 +22,7 @@ const INITIAL_VIEW = {
 }
 
 export default function MapView({ places, purchasedCollectionIds, isAdmin }: MapViewProps) {
-  const mapRef = useRef<MapRef>(null)
+  const mapRef = useRef(null)
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
   const [isLocating, setIsLocating] = useState(false)
   const [collections, setCollections] = useState<Collection[]>([])
