@@ -62,7 +62,7 @@ export default async function EditPlacePage({ params }: { params: Promise<{ id: 
               defaultValue={place.collection_id}
               className="w-full bg-transparent border-b border-neutral-300 pb-2 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
             >
-              {collections?.map((col: Collection) => (
+              {collections?.map(col => (
                 <option key={col.id} value={col.id}>{col.name ?? col.city}</option>
               ))}
             </select>
