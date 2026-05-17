@@ -5,10 +5,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   reactStrictMode: true,
-  experimental: {
-    // Disable dev overlay
-    disableUnsafeInlineCSS: false,
-  },
 };
 
 export default nextConfig;
