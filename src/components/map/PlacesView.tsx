@@ -5,17 +5,17 @@ import type { Place, Collection, PlaceCategory } from '@/types'
 import { CATEGORY_COLORS } from './PlacePin'
 
 const CATEGORY_LABELS: Record<PlaceCategory, string> = {
-  art_installation: 'Arte / Instalação',
-  bridge: 'Pontes',
-  commercial: 'Comercial',
+  art_installation: 'Art Installation',
+  bridge: 'Bridge',
+  commercial: 'Commercial',
   landmark: 'Landmark',
-  landscape: 'Paisagismo',
-  museum: 'Museu',
-  office: 'Escritório',
-  other: 'Outro',
-  public: 'Espaço Público',
-  religious: 'Religioso',
-  residential: 'Residencial',
+  landscape: 'Landscape',
+  museum: 'Museum',
+  office: 'Office',
+  other: 'Other',
+  public: 'Public Space',
+  religious: 'Religious',
+  residential: 'Residential',
 }
 
 interface PlacesViewProps {
@@ -90,7 +90,7 @@ export default function PlacesView({
             type="text"
             value={searchQ}
             onChange={(e) => setSearchQ(e.target.value)}
-            placeholder="Buscar lugar..."
+            placeholder="Search places..."
             className="w-full bg-white border border-stone-300 rounded px-3 py-2 text-xs text-stone-700 placeholder-stone-400 outline-none focus:border-stone-400"
           />
         </div>
@@ -98,7 +98,7 @@ export default function PlacesView({
         {/* Category filter */}
         <div className="flex gap-1.5 px-3 pb-2 overflow-x-auto scrollbar-none">
           <button className={chip(activeCategory === 'all')} onClick={() => setActiveCategory('all')}>
-            Tudo
+            All
           </button>
           {availableCategories.map((cat) => (
             <button
@@ -119,7 +119,7 @@ export default function PlacesView({
         {collections.length > 0 && (
           <div className="flex gap-1.5 px-3 pb-3 overflow-x-auto scrollbar-none">
             <button className={chip(activeCollection === 'all')} onClick={() => setActiveCollection('all')}>
-              Todas
+              All
             </button>
             {collections.map((col) => (
               <button
@@ -135,14 +135,14 @@ export default function PlacesView({
 
         {/* Stats */}
         <div className="px-3 pb-2 text-[9px] tracking-widest uppercase text-stone-400">
-          {filtered.length} lugar{filtered.length !== 1 ? 'es' : ''}
+          {filtered.length} place{filtered.length !== 1 ? 's' : ''}
         </div>
       </div>
 
       {/* List */}
       <div className="flex-1 overflow-y-auto bg-white">
         {grouped.catOrder.length === 0 ? (
-          <p className="text-stone-400 text-xs text-center py-12">Nenhum lugar encontrado</p>
+          <p className="text-stone-400 text-xs text-center py-12">No places found</p>
         ) : (
           grouped.catOrder.map((cat) => {
             const groups = grouped.cats[cat]

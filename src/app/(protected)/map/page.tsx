@@ -76,7 +76,7 @@ export default async function MapPage() {
 
       {IS_DEMO && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-amber-400/90 text-stone-950 text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm z-30 pointer-events-none">
-          Modo demo — configure o Supabase para dados reais
+          Demo mode — configure Supabase for real data
         </div>
       )}
     </div>

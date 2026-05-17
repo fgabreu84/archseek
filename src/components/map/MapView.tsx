@@ -9,17 +9,17 @@ import PlacePanel from './PlacePanel'
 import PlacesView from './PlacesView'
 
 const CATEGORY_LABELS: Record<PlaceCategory, string> = {
-  art_installation: 'Arte / Instalação',
-  bridge: 'Pontes',
-  commercial: 'Comercial',
+  art_installation: 'Art Installation',
+  bridge: 'Bridge',
+  commercial: 'Commercial',
   landmark: 'Landmark',
-  landscape: 'Paisagismo',
-  museum: 'Museu',
-  office: 'Escritório',
-  other: 'Outro',
-  public: 'Espaço Público',
-  religious: 'Religioso',
-  residential: 'Residencial',
+  landscape: 'Landscape',
+  museum: 'Museum',
+  office: 'Office',
+  other: 'Other',
+  public: 'Public Space',
+  religious: 'Religious',
+  residential: 'Residential',
 }
 
 interface MapViewProps {
@@ -136,13 +136,13 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
           type="text"
           value={searchQ}
           onChange={(e) => setSearchQ(e.target.value)}
-          placeholder={mobile ? 'Buscar...' : 'Buscar lugar...'}
+          placeholder={mobile ? 'Search...' : 'Search places...'}
           className="w-full bg-white border border-stone-300 rounded px-3 py-1.5 text-xs text-stone-700 placeholder-stone-400 outline-none focus:border-stone-400"
         />
       </div>
       <div className="px-3 py-1.5 border-b border-stone-200">
         <span className="text-[9px] tracking-widest uppercase text-stone-400">
-          {filteredPlaces.length} lugar{filteredPlaces.length !== 1 ? 'es' : ''}
+          {filteredPlaces.length} place{filteredPlaces.length !== 1 ? 's' : ''}
         </span>
       </div>
       <div className="flex-1 overflow-y-auto">
@@ -199,7 +199,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                   : 'border-transparent text-stone-400 hover:text-stone-700'
               }`}
             >
-              {tab === 'map' ? 'Mapa' : 'Places'}
+              {tab === 'map' ? 'Map' : 'Places'}
             </button>
           ))}
         </div>
@@ -209,7 +209,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
             {/* Category chips */}
             <div className="flex gap-1.5 px-3 py-2 overflow-x-auto scrollbar-none">
               <button className={chip(activeCategory === 'all')} onClick={() => setActiveCategory('all')}>
-                Tudo
+                All
               </button>
               {availableCategories.map((cat) => (
                 <button
@@ -227,7 +227,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
             {collections.length > 0 && (
               <div className="flex gap-1.5 px-3 pb-2 overflow-x-auto scrollbar-none">
                 <button className={chip(activeCollection === 'all')} onClick={() => setActiveCollection('all')}>
-                  Todas
+                  All
                 </button>
                 {collections.map((col) => (
                   <button
@@ -321,7 +321,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                 {/* Legend */}
                 {availableCategories.length > 0 && (
                   <div className="bg-white/95 border border-neutral-200 rounded shadow-sm px-3 py-2">
-                    <div className="text-[9px] tracking-widest uppercase text-neutral-400 mb-1.5">Categorias</div>
+                    <div className="text-[9px] tracking-widest uppercase text-neutral-400 mb-1.5">Categories</div>
                     {availableCategories.map((cat) => (
                       <div key={cat} className="flex items-center gap-1.5 py-0.5 text-[10px] text-neutral-700">
                         <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLORS[cat] }} />
@@ -353,7 +353,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                 <button
                   onClick={handleGeolocate}
                   disabled={isLocating}
-                  title="Minha localização"
+                  title="My location"
                   className="w-8 h-8 bg-white border border-neutral-300 rounded flex items-center justify-center hover:bg-neutral-50 disabled:opacity-50 transition-colors shadow-sm"
                 >
                   <svg className={`w-4 h-4 ${isLocating ? 'text-blue-500' : 'text-neutral-600'}`} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
