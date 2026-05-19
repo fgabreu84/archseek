@@ -66,7 +66,7 @@ export default async function MapPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-57px)] w-full relative flex flex-col">
+    <div className="h-[calc(100vh-56px)] w-full relative flex flex-col">
       <MapView
         places={places}
         collections={collections}

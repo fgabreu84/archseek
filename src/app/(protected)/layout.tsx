@@ -25,22 +25,22 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <header className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 bg-white sticky top-0 z-50">
-        <Link href="/map" className="text-sm font-medium tracking-widest uppercase">
+      <header className="flex items-center gap-4 px-4 sm:px-6 border-b border-neutral-200 bg-white sticky top-0 z-50 h-14">
+        <Link href="/map" className="text-sm font-medium tracking-widest uppercase flex-shrink-0">
           ARCHSEEK
         </Link>
-        <nav className="flex items-center gap-6 text-xs tracking-widest uppercase text-neutral-400">
-          <Link href="/collections" className="hover:text-neutral-900 transition-colors">
+        <nav className="flex items-center gap-5 text-xs tracking-widest uppercase text-neutral-400 overflow-x-auto scrollbar-none flex-1 h-full">
+          <Link href="/collections" className="hover:text-neutral-900 transition-colors whitespace-nowrap flex-shrink-0">
             Collections
           </Link>
           {isAdmin && (
-            <Link href="/admin" className="hover:text-neutral-900 transition-colors">
+            <Link href="/admin" className="hover:text-neutral-900 transition-colors whitespace-nowrap flex-shrink-0">
               Admin
             </Link>
           )}
           {!IS_DEMO && (
-            <form action="/api/auth/signout" method="post">
-              <button type="submit" className="hover:text-neutral-900 transition-colors">
+            <form action="/api/auth/signout" method="post" className="flex-shrink-0">
+              <button type="submit" className="hover:text-neutral-900 transition-colors whitespace-nowrap">
                 Sign Out
               </button>
             </form>
