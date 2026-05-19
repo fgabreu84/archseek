@@ -15,7 +15,7 @@ export default async function MapPage() {
   if (IS_DEMO) {
     places = MOCK_PLACES
     collections = MOCK_COLLECTIONS
-    purchasedIds = ['col-sp']
+    purchasedIds = ['col-sp', 'col-csh']
   } else {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
