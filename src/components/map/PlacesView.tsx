@@ -171,7 +171,7 @@ export default function PlacesView({
                     )}
                     {group.places.map((place) => {
                       const isLocked =
-                        !isAdmin && !purchasedCollectionIds.includes(place.collection_id)
+                        !isAdmin && !!place.collection_id && !purchasedCollectionIds.includes(place.collection_id)
                       return (
                         <button
                           key={place.id}

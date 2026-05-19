@@ -25,7 +25,7 @@ export default async function AdminPlacesPage() {
             href="/admin/places/import"
             className="bg-white text-neutral-900 text-xs tracking-widest uppercase px-4 py-2.5 border border-neutral-300 hover:border-neutral-900 transition-colors"
           >
-            ⬆ Import KML
+            ⬆ Import CSV / KML
           </Link>
           <Link
             href="/admin/places/new"

@@ -55,7 +55,8 @@ export default async function MapPage() {
 
     const allPlaces = (placesData ?? []) as Place[]
     purchasedIds = isAdmin ? [] : (purchases ?? []).map((p: { collection_id: string }) => p.collection_id)
-    places = isAdmin ? allPlaces : allPlaces.filter((p) => purchasedIds.includes(p.collection_id))
+    // Places with no collection are public (visible to all)
+    places = isAdmin ? allPlaces : allPlaces.filter((p) => !p.collection_id || purchasedIds.includes(p.collection_id))
 
     const allCollections = (collectionsData ?? []) as Collection[]
     collections = isAdmin

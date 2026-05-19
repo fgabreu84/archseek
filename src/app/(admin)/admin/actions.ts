@@ -89,7 +89,7 @@ export async function createPlace(formData: FormData) {
   }
 
   const { data, error } = await supabase.from('places').insert({
-    collection_id: formData.get('collection_id') as string,
+    collection_id: (formData.get('collection_id') as string) || null,
     name: formData.get('name') as string,
     category: formData.get('category') as string,
     architect: (formData.get('architect') as string) || null,
@@ -118,7 +118,7 @@ export async function updatePlace(id: string, formData: FormData) {
   }
 
   const { error } = await supabase.from('places').update({
-    collection_id: formData.get('collection_id') as string,
+    collection_id: (formData.get('collection_id') as string) || null,
     name: formData.get('name') as string,
     category: formData.get('category') as string,
     architect: (formData.get('architect') as string) || null,
@@ -195,13 +195,20 @@ export async function deletePlaceImage(imageId: string, placeId: string) {
 
 // ── Import ────────────────────────────────────────────────────
 
-export async function batchCreatePlaces(collectionId: string, places: Array<{ name: string; latitude: number; longitude: number }>) {
+export async function batchCreatePlaces(
+  collectionId: string | null,
+  category: string,
+  places: Array<{ name: string; latitude: number; longitude: number; description?: string; architect?: string; year_built?: number }>
+) {
   const supabase = await createClient()
 
   const placesToInsert = places.map((place) => ({
-    collection_id: collectionId,
+    collection_id: collectionId || null,
     name: place.name,
-    category: 'museum',
+    category,
+    description: place.description || null,
+    architect: place.architect || null,
+    year_built: place.year_built || null,
     latitude: place.latitude,
     longitude: place.longitude,
     is_published: false,

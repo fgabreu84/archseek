@@ -153,7 +153,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
             </div>
             {sidebarGroups[cat]!.map((place) => {
               const col = collections.find((c) => c.id === place.collection_id)
-              const isLocked = !isAdmin && !purchasedCollectionIds.includes(place.collection_id)
+              const isLocked = !isAdmin && !!place.collection_id && !purchasedCollectionIds.includes(place.collection_id)
               return (
                 <button
                   key={place.id}
@@ -302,7 +302,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                     <PlacePin
                       category={place.category}
                       isSelected={selectedPlace?.id === place.id}
-                      isLocked={!isAdmin && !purchasedCollectionIds.includes(place.collection_id)}
+                      isLocked={!isAdmin && !!place.collection_id && !purchasedCollectionIds.includes(place.collection_id)}
                     />
                   </Marker>
                 ))}
@@ -386,7 +386,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
       {selectedPlace && viewTab === 'map' && (
         <PlacePanel
           place={selectedPlace}
-          isLocked={!isAdmin && !purchasedCollectionIds.includes(selectedPlace.collection_id)}
+          isLocked={!isAdmin && !!selectedPlace.collection_id && !purchasedCollectionIds.includes(selectedPlace.collection_id)}
           onClose={handleClose}
         />
       )}

@@ -36,19 +36,14 @@ export default async function NewPlacePage() {
           <label className="block text-xs tracking-widest uppercase text-neutral-400 mb-2">Collection</label>
           <select
             name="collection_id"
-            required
             className="w-full bg-transparent border-b border-neutral-300 pb-2 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
           >
-            <option value="">Select a collection</option>
+            <option value="">No collection — visible to all users</option>
             {collections?.map(col => (
               <option key={col.id} value={col.id}>{col.name ?? col.city}</option>
             ))}
           </select>
-          {!collections?.length && (
-            <p className="text-xs text-neutral-400 mt-1">
-              <Link href="/admin/collections/new" className="underline">Create a collection</Link> before adding places.
-            </p>
-          )}
+          <p className="text-xs text-neutral-400 mt-1">Places without a collection are public and don't require purchase.</p>
         </div>
 
         <Field label="Place Name" name="name" required placeholder="MASP" />

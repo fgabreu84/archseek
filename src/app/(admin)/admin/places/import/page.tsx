@@ -14,7 +14,7 @@ export default async function ImportPlacesPage() {
           ← Places
         </Link>
         <span className="text-neutral-200">/</span>
-        <span className="text-xs tracking-widest uppercase text-neutral-900">Import KML</span>
+        <span className="text-xs tracking-widest uppercase text-neutral-900">Import CSV / KML</span>
       </div>
 
       <ImportForm collections={collections || []} />
