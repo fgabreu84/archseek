@@ -52,6 +52,8 @@ function LoginForm() {
 
   return (
     <div>
+      <h1 className="text-sm font-medium tracking-wide text-neutral-900 mb-8">Sign In</h1>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-xs tracking-widest uppercase text-neutral-400 mb-2">Email</label>
