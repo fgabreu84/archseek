@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 async function uploadToStorage(file: File, path: string): Promise<string> {
   const supabase = createAdminClient()
   const { error } = await supabase.storage.from('images').upload(path, file, { upsert: true })
-  if (error) throw new Error(`Upload falhou: ${error.message}`)
+  if (error) throw new Error(`Upload failed: ${error.message}`)
   const { data } = supabase.storage.from('images').getPublicUrl(path)
   return data.publicUrl
 }

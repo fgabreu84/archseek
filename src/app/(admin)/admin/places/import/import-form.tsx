@@ -83,7 +83,7 @@ function parseCSV(content: string): { places: ParsedPlace[]; skipped: string[] }
   const yearI = colIdx(headers, ['year_built', 'year', 'ano', 'built'])
   const urlI  = colIdx(headers, ['url', 'link', 'maps', 'google maps'])
 
-  if (nameI < 0) throw new Error('Cannot find a name column. Expected: "name", "title", or "título".')
+  if (nameI < 0) throw new Error('Cannot find a name column. Expected: "name", "title", or "place".')
   if ((latI < 0 || lngI < 0) && urlI < 0)
     throw new Error('Cannot find coordinates. Provide "latitude"/"longitude" columns, or a "url" column with Google Maps links.')
 
@@ -197,7 +197,7 @@ export default function ImportForm({ collections }: { collections: any[] }) {
       {fileType === 'csv' && (
         <div className="p-3 bg-neutral-50 border border-neutral-200 text-xs text-neutral-500 space-y-1">
           <p className="font-medium text-neutral-700">Required columns</p>
-          <p><code className="bg-neutral-100 px-1">name</code> (or <code className="bg-neutral-100 px-1">title</code> / <code className="bg-neutral-100 px-1">título</code>)</p>
+          <p><code className="bg-neutral-100 px-1">name</code> (or <code className="bg-neutral-100 px-1">title</code> / <code className="bg-neutral-100 px-1">place</code>)</p>
           <p>
             <code className="bg-neutral-100 px-1">latitude</code> + <code className="bg-neutral-100 px-1">longitude</code>
             {' '}— or a <code className="bg-neutral-100 px-1">url</code> column with Google Maps links that contain coordinates.
