@@ -24,8 +24,8 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <header className="flex items-center gap-4 px-4 sm:px-6 border-b border-neutral-200 bg-white sticky top-0 z-50 h-14">
+    <div className="flex flex-col h-full bg-white">
+      <header className="flex items-center gap-4 px-4 sm:px-6 border-b border-neutral-200 bg-white sticky top-0 z-50 h-14 flex-shrink-0">
         <Link href="/map" className="text-sm font-medium tracking-widest uppercase flex-shrink-0">
           ARCHSEEK
         </Link>
@@ -47,7 +47,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
           )}
         </nav>
       </header>
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 overflow-y-auto overflow-x-hidden">{children}</main>
     </div>
   )
 }

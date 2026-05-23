@@ -337,7 +337,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
 
                 {/* Legend */}
                 {availableCategories.length > 0 && (
-                  <div className="bg-white/95 border border-neutral-200 rounded shadow-sm px-3 py-2">
+                  <div className="hidden sm:block bg-white/95 border border-neutral-200 rounded shadow-sm px-3 py-2">
                     <div className="text-[9px] tracking-widest uppercase text-neutral-400 mb-1.5">Categories</div>
                     {availableCategories.map((cat) => (
                       <div key={cat} className="flex items-center gap-1.5 py-0.5 text-[10px] text-neutral-700">
@@ -366,12 +366,12 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                   </button>
                 </div>
 
-                {/* Geolocation */}
+                {/* Geolocation — desktop only */}
                 <button
                   onClick={handleGeolocate}
                   disabled={isLocating}
                   title="My location"
-                  className="w-8 h-8 bg-white border border-neutral-300 rounded flex items-center justify-center hover:bg-neutral-50 disabled:opacity-50 transition-colors shadow-sm"
+                  className="hidden sm:flex w-8 h-8 bg-white border border-neutral-300 rounded items-center justify-center hover:bg-neutral-50 disabled:opacity-50 transition-colors shadow-sm"
                 >
                   <svg className={`w-4 h-4 ${isLocating ? 'text-blue-500' : 'text-neutral-600'}`} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="3" fill="currentColor" />
@@ -380,6 +380,20 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                   </svg>
                 </button>
               </div>
+
+              {/* Geolocation — mobile FAB bottom-right */}
+              <button
+                onClick={handleGeolocate}
+                disabled={isLocating}
+                aria-label="My location"
+                className="sm:hidden absolute bottom-6 right-4 z-10 w-12 h-12 bg-white border border-neutral-200 rounded-full flex items-center justify-center shadow-lg active:scale-95 disabled:opacity-50 transition-transform"
+              >
+                <svg className={`w-5 h-5 ${isLocating ? 'text-blue-500' : 'text-neutral-600'}`} fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="3" fill="currentColor" />
+                  <circle cx="12" cy="12" r="7" />
+                  <path d="M12 2v2m0 16v2M22 12h-2M4 12H2" strokeLinecap="round" />
+                </svg>
+              </button>
 
             </div>
           </>
