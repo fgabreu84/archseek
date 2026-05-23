@@ -123,21 +123,7 @@ function parseCSV(content: string): { places: ParsedPlace[]; skipped: string[] }
 }
 
 // ── Component ─────────────────────────────────────────────────
-const CATEGORIES = [
-  { value: 'other',            label: 'Other' },
-  { value: 'art_installation', label: 'Art Installation' },
-  { value: 'bridge',           label: 'Bridge' },
-  { value: 'commercial',       label: 'Commercial' },
-  { value: 'landmark',         label: 'Landmark' },
-  { value: 'landscape',        label: 'Landscape' },
-  { value: 'museum',           label: 'Museum' },
-  { value: 'office',           label: 'Office' },
-  { value: 'public',           label: 'Public Space' },
-  { value: 'religious',        label: 'Religious' },
-  { value: 'residential',      label: 'Residential' },
-]
-
-export default function ImportForm({ collections }: { collections: any[] }) {
+export default function ImportForm({ collections, categories }: { collections: any[]; categories: { slug: string; label: string }[] }) {
   const [fileType, setFileType]       = useState<'kml' | 'csv'>('csv')
   const [collectionId, setCollectionId] = useState('')
   const [category, setCategory]       = useState('other')
@@ -233,8 +219,8 @@ export default function ImportForm({ collections }: { collections: any[] }) {
           onChange={(e) => setCategory(e.target.value)}
           className="w-full bg-transparent border-b border-neutral-300 pb-2 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
         >
-          {CATEGORIES.map((c) => (
-            <option key={c.value} value={c.value}>{c.label}</option>
+          {categories.map((c) => (
+            <option key={c.slug} value={c.slug}>{c.label}</option>
           ))}
         </select>
       </div>

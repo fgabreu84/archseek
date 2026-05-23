@@ -10,7 +10,7 @@ export default function HomePage() {
         <div className="mb-12">
           <span
             className={josefin.className}
-            style={{ fontSize: '36px', fontWeight: 100, letterSpacing: '0.4em', textTransform: 'uppercase' }}
+            style={{ fontSize: '42px', fontWeight: 120, letterSpacing: '0.4em', textTransform: 'uppercase' }}
           >
             ARCHSEEK
           </span>

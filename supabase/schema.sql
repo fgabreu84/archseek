@@ -67,12 +67,41 @@ create policy "collections: admin all" on public.collections
   using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
 
 -- ============================================================
--- PLACES
+-- CATEGORIES
 -- ============================================================
-create type public.place_category as enum (
-  'religious', 'museum', 'residential', 'commercial', 'public', 'bridge', 'landscape', 'art_installation', 'landmark', 'office', 'other'
+create table public.categories (
+  slug        text primary key,
+  label       text not null,
+  order_index integer not null default 0,
+  created_at  timestamptz not null default now()
 );
 
+alter table public.categories enable row level security;
+
+create policy "categories: public read" on public.categories
+  for select using (true);
+
+create policy "categories: admin all" on public.categories
+  using (exists (select 1 from public.profiles where id = auth.uid() and role = 'admin'));
+
+insert into public.categories (slug, label, order_index) values
+  ('art_installation', 'Art Installation', 0),
+  ('bridge',           'Bridge',           1),
+  ('commercial',       'Commercial',       2),
+  ('education',        'Education',        3),
+  ('landmark',         'Landmark',         4),
+  ('landscape',        'Landscape',        5),
+  ('museum',           'Museum',           6),
+  ('office',           'Office',           7),
+  ('other',            'Other',            8),
+  ('public',           'Public Space',     9),
+  ('religious',        'Religious',        10),
+  ('residential',      'Residential',      11)
+on conflict (slug) do nothing;
+
+-- ============================================================
+-- PLACES
+-- ============================================================
 create table public.places (
   id uuid primary key default uuid_generate_v4(),
   collection_id uuid references public.collections(id) on delete cascade not null,
@@ -80,7 +109,7 @@ create table public.places (
   description text,
   architect text,
   year_built integer,
-  category public.place_category not null default 'other',
+  category text not null default 'other',
   latitude numeric(10,7) not null,
   longitude numeric(10,7) not null,
   cover_image_url text,

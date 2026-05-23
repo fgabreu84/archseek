@@ -5,7 +5,10 @@ import ImportForm from './import-form'
 
 export default async function ImportPlacesPage() {
   const supabase = await createClient()
-  const { data: collections } = await supabase.from('collections').select('id, name, city').order('city')
+  const [{ data: collections }, { data: categories }] = await Promise.all([
+    supabase.from('collections').select('id, name, city').order('city'),
+    supabase.from('categories').select('slug, label').order('label'),
+  ])
 
   return (
     <div className="max-w-2xl">
@@ -17,7 +20,7 @@ export default async function ImportPlacesPage() {
         <span className="text-xs tracking-widest uppercase text-neutral-900">Import CSV / KML</span>
       </div>
 
-      <ImportForm collections={collections || []} />
+      <ImportForm collections={collections || []} categories={categories || []} />
     </div>
   )
 }

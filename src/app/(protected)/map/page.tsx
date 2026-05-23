@@ -11,11 +11,18 @@ export default async function MapPage() {
   let collections: Collection[] = []
   let purchasedIds: string[] = []
   let isAdmin = false
+  let categoryLabels: Record<string, string> = {}
 
   if (IS_DEMO) {
     places = MOCK_PLACES
     collections = MOCK_COLLECTIONS
     purchasedIds = ['col-sp', 'col-csh']
+    categoryLabels = {
+      art_installation: 'Art Installation', bridge: 'Bridge', commercial: 'Commercial',
+      education: 'Education', landmark: 'Landmark', landscape: 'Landscape',
+      museum: 'Museum', office: 'Office', other: 'Other',
+      public: 'Public Space', religious: 'Religious', residential: 'Residential',
+    }
   } else {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -28,7 +35,7 @@ export default async function MapPage() {
 
     isAdmin = profile?.role === 'admin'
 
-    const [{ data: placesData }, { data: purchases }, { data: collectionsData }] = await Promise.all([
+    const [{ data: placesData }, { data: purchases }, { data: collectionsData }, { data: categoriesData }] = await Promise.all([
       supabase
         .from('places')
         .select(`
@@ -51,6 +58,8 @@ export default async function MapPage() {
         .from('collections')
         .select('*')
         .eq('is_published', true),
+
+      supabase.from('categories').select('slug, label'),
     ])
 
     const allPlaces = (placesData ?? []) as Place[]
@@ -64,6 +73,10 @@ export default async function MapPage() {
       : allCollections
           .filter((c) => purchasedIds.includes(c.id))
           .sort((a, b) => a.country.localeCompare(b.country) || a.city.localeCompare(b.city))
+
+    categoryLabels = Object.fromEntries(
+      (categoriesData ?? []).map((c) => [c.slug, c.label])
+    )
   }
 
   return (
@@ -73,6 +86,7 @@ export default async function MapPage() {
         collections={collections}
         purchasedCollectionIds={purchasedIds}
         isAdmin={isAdmin}
+        categoryLabels={categoryLabels}
       />
 
       {IS_DEMO && (

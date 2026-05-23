@@ -3,23 +3,12 @@ import Link from 'next/link'
 import { createPlace } from '../../actions'
 import type { Collection } from '@/types'
 
-const CATEGORIES = [
-  { value: 'art_installation', label: 'Art Installation' },
-  { value: 'bridge', label: 'Bridge' },
-  { value: 'commercial', label: 'Commercial' },
-  { value: 'landmark', label: 'Landmark' },
-  { value: 'landscape', label: 'Landscape' },
-  { value: 'museum', label: 'Museum' },
-  { value: 'office', label: 'Office' },
-  { value: 'other', label: 'Other' },
-  { value: 'public', label: 'Public' },
-  { value: 'religious', label: 'Religious' },
-  { value: 'residential', label: 'Residential' },
-]
-
 export default async function NewPlacePage() {
   const supabase = await createClient()
-  const { data: collections } = await supabase.from('collections').select('id, name, city').order('city')
+  const [{ data: collections }, { data: categories }] = await Promise.all([
+    supabase.from('collections').select('id, name, city').order('city'),
+    supabase.from('categories').select('slug, label').order('label'),
+  ])
 
   return (
     <div className="max-w-2xl">
@@ -55,8 +44,8 @@ export default async function NewPlacePage() {
             required
             className="w-full bg-transparent border-b border-neutral-300 pb-2 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
           >
-            {CATEGORIES.map(c => (
-              <option key={c.value} value={c.value}>{c.label}</option>
+            {(categories ?? []).map((c) => (
+              <option key={c.slug} value={c.slug}>{c.label}</option>
             ))}
           </select>
         </div>

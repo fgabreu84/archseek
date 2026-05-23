@@ -40,18 +40,14 @@ export interface Place {
   collection?: Collection
 }
 
-export type PlaceCategory =
-  | 'art_installation'
-  | 'bridge'
-  | 'commercial'
-  | 'landmark'
-  | 'landscape'
-  | 'museum'
-  | 'office'
-  | 'other'
-  | 'public'
-  | 'religious'
-  | 'residential'
+export type PlaceCategory = string
+
+export interface Category {
+  slug: string
+  label: string
+  order_index: number
+  created_at: string
+}
 
 export interface PlaceImage {
   id: string

@@ -7,21 +7,7 @@ import PublishButton from '@/components/admin/PublishButton'
 import { deletePlace, togglePublishPlace, batchPublishPlaces, batchDeletePlaces } from '../actions'
 import type { Place } from '@/types'
 
-const CATEGORY_LABELS: Record<string, string> = {
-  art_installation: 'Art Installation',
-  bridge: 'Bridge',
-  commercial: 'Commercial',
-  landmark: 'Landmark',
-  landscape: 'Landscape',
-  museum: 'Museum',
-  office: 'Office',
-  other: 'Other',
-  public: 'Public',
-  religious: 'Religious',
-  residential: 'Residential',
-}
-
-export default function PlacesList({ places }: { places: (Place & { collection?: { name: string; city: string } })[] }) {
+export default function PlacesList({ places, categoryLabels }: { places: (Place & { collection?: { name: string; city: string } })[]; categoryLabels: Record<string, string> }) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [isPublishing, setIsPublishing] = useState(false)
 
@@ -135,7 +121,7 @@ export default function PlacesList({ places }: { places: (Place & { collection?:
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm text-neutral-900">{place.name}</span>
-                      <span className="text-xs text-neutral-400">{CATEGORY_LABELS[place.category]}</span>
+                      <span className="text-xs text-neutral-400">{categoryLabels[place.category] ?? place.category}</span>
                       {place.is_published ? (
                         <span className="text-xs text-neutral-400 border border-neutral-200 px-1.5 py-0.5 tracking-wide">published</span>
                       ) : (
