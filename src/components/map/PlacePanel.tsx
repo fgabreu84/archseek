@@ -1,36 +1,23 @@
 'use client'
 
 import Link from 'next/link'
-import type { Place, PlaceCategory } from '@/types'
+import type { Place } from '@/types'
 
 interface PlacePanelProps {
   place: Place
   isLocked: boolean
   onClose: () => void
+  categoryLabels: Record<string, string>
 }
 
-const CATEGORY_LABELS: Record<PlaceCategory, string> = {
-  art_installation: 'Art Installation',
-  bridge: 'Bridge',
-  commercial: 'Commercial',
-  landmark: 'Landmark',
-  landscape: 'Landscape',
-  museum: 'Museum',
-  office: 'Office',
-  other: 'Other',
-  public: 'Public',
-  religious: 'Religious',
-  residential: 'Residential',
-}
-
-export default function PlacePanel({ place, isLocked, onClose }: PlacePanelProps) {
+export default function PlacePanel({ place, isLocked, onClose, categoryLabels }: PlacePanelProps) {
   return (
     <div className="absolute bottom-0 left-0 right-0 h-[30%] w-full sm:bottom-auto sm:top-0 sm:right-0 sm:left-auto sm:h-full sm:w-80 bg-white border-t border-neutral-200 sm:border-t-0 sm:border-l shadow-xl flex flex-col z-30 animate-slide-in">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-100 flex-shrink-0">
         <div className="flex-1 pr-3 min-w-0">
           <span className="text-[10px] text-neutral-400 uppercase tracking-widest leading-none block truncate">
-            {CATEGORY_LABELS[place.category]}
+            {categoryLabels[place.category] ?? place.category}
             {place.collection && ` · ${place.collection.city}`}
           </span>
           <h2 className="text-sm font-medium text-neutral-900 leading-snug truncate">{place.name}</h2>

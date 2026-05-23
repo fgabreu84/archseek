@@ -1,22 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import type { Place, Collection, PlaceCategory } from '@/types'
-import { CATEGORY_COLORS } from './PlacePin'
-
-const CATEGORY_LABELS: Record<PlaceCategory, string> = {
-  art_installation: 'Art Installation',
-  bridge: 'Bridge',
-  commercial: 'Commercial',
-  landmark: 'Landmark',
-  landscape: 'Landscape',
-  museum: 'Museum',
-  office: 'Office',
-  other: 'Other',
-  public: 'Public Space',
-  religious: 'Religious',
-  residential: 'Residential',
-}
+import type { Place, Collection } from '@/types'
+import { getCategoryColor } from './PlacePin'
 
 interface PlacesViewProps {
   places: Place[]
@@ -24,6 +10,7 @@ interface PlacesViewProps {
   purchasedCollectionIds: string[]
   isAdmin: boolean
   onSelectPlace: (place: Place) => void
+  categoryLabels: Record<string, string>
 }
 
 export default function PlacesView({
@@ -32,9 +19,10 @@ export default function PlacesView({
   purchasedCollectionIds,
   isAdmin,
   onSelectPlace,
+  categoryLabels,
 }: PlacesViewProps) {
   const [searchQ, setSearchQ] = useState('')
-  const [activeCategory, setActiveCategory] = useState<PlaceCategory | 'all'>('all')
+  const [activeCategory, setActiveCategory] = useState<string | 'all'>('all')
   const [activeCollection, setActiveCollection] = useState<string | 'all'>('all')
 
   const filtered = useMemo(() => {
@@ -48,16 +36,11 @@ export default function PlacesView({
 
   const grouped = useMemo(() => {
     const cats: Record<string, { collection: Collection | undefined; places: Place[] }[]> = {}
-    const catOrder: PlaceCategory[] = []
 
     for (const p of filtered) {
-      if (!cats[p.category]) {
-        cats[p.category] = []
-        catOrder.push(p.category as PlaceCategory)
-      }
+      if (!cats[p.category]) cats[p.category] = []
       const col = collections.find((c) => c.id === p.collection_id)
-      const colKey = p.collection_id
-      let group = cats[p.category].find((g) => g.collection?.id === colKey)
+      let group = cats[p.category].find((g) => g.collection?.id === p.collection_id)
       if (!group) {
         group = { collection: col, places: [] }
         cats[p.category].push(group)
@@ -65,13 +48,30 @@ export default function PlacesView({
       group.places.push(p)
     }
 
+    // Sort categories by label, collection groups by country+city, places by name
+    const catOrder = Object.keys(cats).sort(
+      (a, b) => (categoryLabels[a] ?? a).localeCompare(categoryLabels[b] ?? b)
+    )
+    for (const cat of catOrder) {
+      cats[cat].sort((a, b) => {
+        const ac = a.collection, bc = b.collection
+        if (!ac && !bc) return 0
+        if (!ac) return -1
+        if (!bc) return 1
+        return ac.country.localeCompare(bc.country) || ac.city.localeCompare(bc.city)
+      })
+      for (const group of cats[cat]) {
+        group.places.sort((a, b) => a.name.localeCompare(b.name))
+      }
+    }
+
     return { cats, catOrder }
-  }, [filtered, collections])
+  }, [filtered, collections, categoryLabels])
 
   const availableCategories = useMemo(() => {
-    const set = new Set(places.map((p) => p.category))
-    return (Object.keys(CATEGORY_LABELS) as PlaceCategory[]).filter((c) => set.has(c))
-  }, [places])
+    return Array.from(new Set(places.map((p) => p.category)))
+      .sort((a, b) => (categoryLabels[a] ?? a).localeCompare(categoryLabels[b] ?? b))
+  }, [places, categoryLabels])
 
   const chip = (active: boolean) =>
     `flex-shrink-0 text-[10px] tracking-wider uppercase px-2.5 py-1 rounded border cursor-pointer transition-colors whitespace-nowrap ${
@@ -108,9 +108,9 @@ export default function PlacesView({
             >
               <span
                 className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                style={{ background: CATEGORY_COLORS[cat] }}
+                style={{ background: getCategoryColor(cat) }}
               />
-              {CATEGORY_LABELS[cat]}
+              {categoryLabels[cat] ?? cat}
             </button>
           ))}
         </div>
@@ -121,15 +121,17 @@ export default function PlacesView({
             <button className={chip(activeCollection === 'all')} onClick={() => setActiveCollection('all')}>
               All
             </button>
-            {collections.map((col) => (
-              <button
-                key={col.id}
-                className={chip(activeCollection === col.id)}
-                onClick={() => setActiveCollection(activeCollection === col.id ? 'all' : col.id)}
-              >
-                {col.city}
-              </button>
-            ))}
+            {[...collections]
+              .sort((a, b) => a.country.localeCompare(b.country) || a.city.localeCompare(b.city))
+              .map((col) => (
+                <button
+                  key={col.id}
+                  className={chip(activeCollection === col.id)}
+                  onClick={() => setActiveCollection(activeCollection === col.id ? 'all' : col.id)}
+                >
+                  {col.city}
+                </button>
+              ))}
           </div>
         )}
 
@@ -153,10 +155,10 @@ export default function PlacesView({
                 <div className="sticky top-0 flex items-center gap-2 px-3 py-2 bg-stone-100 border-b border-stone-200 z-10">
                   <span
                     className="w-2 h-2 rounded-full flex-shrink-0"
-                    style={{ background: CATEGORY_COLORS[cat] }}
+                    style={{ background: getCategoryColor(cat) }}
                   />
                   <span className="text-[10px] tracking-widest uppercase text-stone-600 flex-1">
-                    {CATEGORY_LABELS[cat]}
+                    {categoryLabels[cat] ?? cat}
                   </span>
                   <span className="text-[9px] text-stone-400">{total}</span>
                 </div>
@@ -181,7 +183,7 @@ export default function PlacesView({
                           <div className="flex items-center gap-2 min-w-0">
                             <span
                               className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                              style={{ background: isLocked ? '#d1d5db' : CATEGORY_COLORS[cat] }}
+                              style={{ background: isLocked ? '#d1d5db' : getCategoryColor(cat) }}
                             />
                             <span
                               className={`text-xs truncate ${isLocked ? 'text-stone-400' : 'text-stone-700'}`}

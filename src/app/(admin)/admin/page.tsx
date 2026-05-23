@@ -19,6 +19,13 @@ export default function AdminPage() {
           <h2 className="text-xs tracking-widest uppercase text-neutral-400 mb-2 group-hover:text-neutral-900 transition-colors">Places</h2>
           <p className="text-sm text-neutral-600">Add and edit architectural works</p>
         </Link>
+        <Link
+          href="/admin/categories"
+          className="border border-neutral-200 p-6 hover:border-neutral-900 transition-colors group"
+        >
+          <h2 className="text-xs tracking-widest uppercase text-neutral-400 mb-2 group-hover:text-neutral-900 transition-colors">Categories</h2>
+          <p className="text-sm text-neutral-600">Manage place categories</p>
+        </Link>
       </div>
     </div>
   )

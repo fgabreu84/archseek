@@ -6,11 +6,17 @@ import type { Place } from '@/types'
 
 export default async function AdminPlacesPage() {
   const supabase = await createClient()
-  const { data: places } = await supabase
-    .from('places')
-    .select('*, collection:collections(name, city)')
-    .order('city', { ascending: true, foreignTable: 'collection' })
-    .order('name', { ascending: true })
+  const [{ data: places }, { data: categories }] = await Promise.all([
+    supabase
+      .from('places')
+      .select('*, collection:collections(name, city)')
+      .order('city', { ascending: true, foreignTable: 'collection' })
+      .order('name', { ascending: true }),
+    supabase.from('categories').select('slug, label'),
+  ])
+  const categoryLabels = Object.fromEntries(
+    (categories ?? []).map((c) => [c.slug, c.label])
+  )
 
   return (
     <div>
@@ -43,7 +49,7 @@ export default async function AdminPlacesPage() {
           </p>
         </div>
       ) : (
-        <PlacesList places={places as (Place & { collection?: { name: string; city: string } })[]} />
+        <PlacesList places={places as (Place & { collection?: { name: string; city: string } })[]} categoryLabels={categoryLabels} />
       )}
     </div>
   )

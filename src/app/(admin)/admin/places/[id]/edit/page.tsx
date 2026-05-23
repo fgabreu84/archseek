@@ -5,27 +5,14 @@ import DeleteButton from '@/components/admin/DeleteButton'
 import { updatePlace, deletePlace, addFact, deleteFact, addPlaceImage, deletePlaceImage } from '../../../actions'
 import type { Collection, PlaceFact, PlaceImage } from '@/types'
 
-const CATEGORIES = [
-  { value: 'art_installation', label: 'Art Installation' },
-  { value: 'bridge', label: 'Bridge' },
-  { value: 'commercial', label: 'Commercial' },
-  { value: 'landmark', label: 'Landmark' },
-  { value: 'landscape', label: 'Landscape' },
-  { value: 'museum', label: 'Museum' },
-  { value: 'office', label: 'Office' },
-  { value: 'other', label: 'Other' },
-  { value: 'public', label: 'Public' },
-  { value: 'religious', label: 'Religious' },
-  { value: 'residential', label: 'Residential' },
-]
-
 export default async function EditPlacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: place }, { data: collections }] = await Promise.all([
+  const [{ data: place }, { data: collections }, { data: categories }] = await Promise.all([
     supabase.from('places').select('*, facts:place_facts(*), images:place_images(*)').eq('id', id).single(),
     supabase.from('collections').select('id, name, city').order('city'),
+    supabase.from('categories').select('slug, label').order('label'),
   ])
 
   if (!place) notFound()
@@ -79,8 +66,8 @@ export default async function EditPlacePage({ params }: { params: Promise<{ id: 
               defaultValue={place.category}
               className="w-full bg-transparent border-b border-neutral-300 pb-2 text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
             >
-              {CATEGORIES.map(c => (
-                <option key={c.value} value={c.value}>{c.label}</option>
+              {(categories ?? []).map((c) => (
+                <option key={c.slug} value={c.slug}>{c.label}</option>
               ))}
             </select>
           </div>

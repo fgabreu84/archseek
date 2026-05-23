@@ -49,8 +49,8 @@ export default function UsersList({ profiles, collections, purchases }: UsersLis
               const isExpanded = expandedUserId === profile.id
 
               return (
-                <tbody key={profile.id}>
-                  <tr className="hover:bg-neutral-50 transition-colors">
+                <>
+                  <tr key={profile.id} className="hover:bg-neutral-50 transition-colors">
                     <td className="px-6 py-4 text-sm text-neutral-600">{profile.email}</td>
                     <td className="px-6 py-4 text-sm text-neutral-900 font-medium">
                       {profile.full_name || '—'}
@@ -109,7 +109,7 @@ export default function UsersList({ profiles, collections, purchases }: UsersLis
                       </td>
                     </tr>
                   )}
-                </tbody>
+                </>
               )
             })}
           </tbody>

@@ -3,50 +3,115 @@
 import { useCallback, useRef, useState, useMemo } from 'react'
 import Map, { Marker, ScaleControl } from 'react-map-gl/mapbox'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import type { Place, Collection, PlaceCategory } from '@/types'
-import PlacePin, { CATEGORY_COLORS } from './PlacePin'
+import type { Place, Collection } from '@/types'
+import PlacePin, { getCategoryColor } from './PlacePin'
 import PlacePanel from './PlacePanel'
 import PlacesView from './PlacesView'
-
-const CATEGORY_LABELS: Record<PlaceCategory, string> = {
-  art_installation: 'Art Installation',
-  bridge: 'Bridge',
-  commercial: 'Commercial',
-  landmark: 'Landmark',
-  landscape: 'Landscape',
-  museum: 'Museum',
-  office: 'Office',
-  other: 'Other',
-  public: 'Public Space',
-  religious: 'Religious',
-  residential: 'Residential',
-}
 
 interface MapViewProps {
   places: Place[]
   collections: Collection[]
   purchasedCollectionIds: string[]
   isAdmin?: boolean
+  categoryLabels: Record<string, string>
 }
 
 const INITIAL_VIEW = { longitude: 0, latitude: 20, zoom: 2 }
 
-export default function MapView({ places, collections, purchasedCollectionIds, isAdmin = false }: MapViewProps) {
+interface SidebarContentProps {
+  searchQ: string
+  setSearchQ: (q: string) => void
+  filteredPlaces: Place[]
+  sidebarGroups: Record<string, Place[]>
+  collections: Collection[]
+  categoryLabels: Record<string, string>
+  isAdmin: boolean
+  purchasedCollectionIds: string[]
+  selectedPlace: Place | null
+  handleSidebarPlaceClick: (place: Place) => void
+  mobile?: boolean
+}
+
+function SidebarContent({
+  searchQ, setSearchQ, filteredPlaces, sidebarGroups, collections,
+  categoryLabels, isAdmin, purchasedCollectionIds, selectedPlace,
+  handleSidebarPlaceClick, mobile = false,
+}: SidebarContentProps) {
+  return (
+    <>
+      <div className="px-3 py-2 border-b border-stone-200">
+        <input
+          type="text"
+          value={searchQ}
+          onChange={(e) => setSearchQ(e.target.value)}
+          placeholder={mobile ? 'Search...' : 'Search places...'}
+          className="w-full bg-white border border-stone-300 rounded px-3 py-1.5 text-xs text-stone-700 placeholder-stone-400 outline-none focus:border-stone-400"
+        />
+      </div>
+      <div className="px-3 py-1.5 border-b border-stone-200">
+        <span className="text-[9px] tracking-widest uppercase text-stone-400">
+          {filteredPlaces.length} place{filteredPlaces.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        {Object.keys(sidebarGroups).map((cat) => (
+          <div key={cat}>
+            <div className="px-3 py-1.5 text-[9px] tracking-widest uppercase text-stone-400 border-b border-stone-200">
+              {categoryLabels[cat] ?? cat}
+            </div>
+            {sidebarGroups[cat]!.map((place) => {
+              const col = collections.find((c) => c.id === place.collection_id)
+              const isLocked = !isAdmin && !!place.collection_id && !purchasedCollectionIds.includes(place.collection_id)
+              return (
+                <button
+                  key={place.id}
+                  onClick={() => handleSidebarPlaceClick(place)}
+                  className={`w-full flex items-center gap-2 px-3 py-2 border-b border-stone-200 hover:bg-stone-100 transition-colors text-left cursor-pointer ${
+                    selectedPlace?.id === place.id ? 'bg-stone-100' : ''
+                  }`}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full flex-shrink-0"
+                    style={{ background: isLocked ? '#d1d5db' : getCategoryColor(cat) }}
+                  />
+                  <span className={`text-xs flex-1 truncate ${isLocked ? 'text-stone-400' : 'text-stone-700'}`}>
+                    {place.name}
+                  </span>
+                  {!mobile && col && (
+                    <span className="text-[9px] text-stone-400 flex-shrink-0">
+                      {col.city}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+
+export default function MapView({ places, collections, purchasedCollectionIds, isAdmin = false, categoryLabels }: MapViewProps) {
   const mapRef = useRef<any>(null)
 
   const [viewTab, setViewTab] = useState<'map' | 'places'>('map')
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [activeCategory, setActiveCategory] = useState<PlaceCategory | 'all'>('all')
+  const [activeCategory, setActiveCategory] = useState<string | 'all'>('all')
   const [activeCollection, setActiveCollection] = useState<string | 'all'>('all')
   const [searchQ, setSearchQ] = useState('')
   const [isLocating, setIsLocating] = useState(false)
   const [userLocation, setUserLocation] = useState<{ longitude: number; latitude: number } | null>(null)
 
   const availableCategories = useMemo(() => {
-    const set = new Set(places.map((p) => p.category))
-    return (Object.keys(CATEGORY_LABELS) as PlaceCategory[]).filter((c) => set.has(c))
-  }, [places])
+    return Array.from(new Set(places.map((p) => p.category)))
+      .sort((a, b) => (categoryLabels[a] ?? a).localeCompare(categoryLabels[b] ?? b))
+  }, [places, categoryLabels])
+
+  const sortedCollections = useMemo(() => {
+    return [...collections].sort((a, b) => a.country.localeCompare(b.country) || a.city.localeCompare(b.city))
+  }, [collections])
 
   const filteredPlaces = useMemo(() => {
     return places.filter((p) => {
@@ -58,10 +123,10 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
   }, [places, activeCategory, activeCollection, searchQ])
 
   const sidebarGroups = useMemo(() => {
-    const groups: Partial<Record<PlaceCategory, Place[]>> = {}
+    const groups: Record<string, Place[]> = {}
     for (const p of filteredPlaces) {
       if (!groups[p.category]) groups[p.category] = []
-      groups[p.category]!.push(p)
+      groups[p.category].push(p)
     }
     return groups
   }, [filteredPlaces])
@@ -129,59 +194,11 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
         : 'border-stone-300 text-stone-500 hover:border-stone-400'
     }`
 
-  const SidebarContent = ({ mobile = false }: { mobile?: boolean }) => (
-    <>
-      <div className="px-3 py-2 border-b border-stone-200">
-        <input
-          type="text"
-          value={searchQ}
-          onChange={(e) => setSearchQ(e.target.value)}
-          placeholder={mobile ? 'Search...' : 'Search places...'}
-          className="w-full bg-white border border-stone-300 rounded px-3 py-1.5 text-xs text-stone-700 placeholder-stone-400 outline-none focus:border-stone-400"
-        />
-      </div>
-      <div className="px-3 py-1.5 border-b border-stone-200">
-        <span className="text-[9px] tracking-widest uppercase text-stone-400">
-          {filteredPlaces.length} place{filteredPlaces.length !== 1 ? 's' : ''}
-        </span>
-      </div>
-      <div className="flex-1 overflow-y-auto">
-        {(Object.keys(sidebarGroups) as PlaceCategory[]).map((cat) => (
-          <div key={cat}>
-            <div className="px-3 py-1.5 text-[9px] tracking-widest uppercase text-stone-400 border-b border-stone-200">
-              {CATEGORY_LABELS[cat]}
-            </div>
-            {sidebarGroups[cat]!.map((place) => {
-              const col = collections.find((c) => c.id === place.collection_id)
-              const isLocked = !isAdmin && !!place.collection_id && !purchasedCollectionIds.includes(place.collection_id)
-              return (
-                <button
-                  key={place.id}
-                  onClick={() => handleSidebarPlaceClick(place)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 border-b border-stone-200 hover:bg-stone-100 transition-colors text-left cursor-pointer ${
-                    selectedPlace?.id === place.id ? 'bg-stone-100' : ''
-                  }`}
-                >
-                  <span
-                    className="w-2 h-2 rounded-full flex-shrink-0"
-                    style={{ background: isLocked ? '#d1d5db' : CATEGORY_COLORS[cat] }}
-                  />
-                  <span className={`text-xs flex-1 truncate ${isLocked ? 'text-stone-400' : 'text-stone-700'}`}>
-                    {place.name}
-                  </span>
-                  {!mobile && col && (
-                    <span className="text-[9px] text-stone-400 flex-shrink-0">
-                      {col.city}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-        ))}
-      </div>
-    </>
-  )
+  const sidebarProps = {
+    searchQ, setSearchQ, filteredPlaces, sidebarGroups, collections,
+    categoryLabels, isAdmin, purchasedCollectionIds, selectedPlace,
+    handleSidebarPlaceClick,
+  }
 
   return (
     <div className="flex flex-col w-full h-full bg-white">
@@ -217,19 +234,19 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                   className={`${chip(activeCategory === cat)} flex items-center gap-1.5`}
                   onClick={() => setActiveCategory(activeCategory === cat ? 'all' : cat)}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLORS[cat] }} />
-                  {CATEGORY_LABELS[cat]}
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: getCategoryColor(cat) }} />
+                  {categoryLabels[cat] ?? cat}
                 </button>
               ))}
             </div>
 
             {/* Collection chips */}
-            {collections.length > 0 && (
+            {sortedCollections.length > 0 && (
               <div className="flex gap-1.5 px-3 pb-2 overflow-x-auto scrollbar-none">
                 <button className={chip(activeCollection === 'all')} onClick={() => setActiveCollection('all')}>
                   All
                 </button>
-                {collections.map((col) => (
+                {sortedCollections.map((col) => (
                   <button
                     key={col.id}
                     className={chip(activeCollection === col.id)}
@@ -252,7 +269,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
           <>
             {/* Desktop sidebar */}
             <aside className="hidden sm:flex w-72 flex-shrink-0 flex-col bg-stone-100 border-r border-stone-200 overflow-hidden z-10">
-              <SidebarContent />
+              <SidebarContent {...sidebarProps} />
             </aside>
 
             {/* Mobile sidebar toggle button */}
@@ -271,7 +288,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                   onClick={() => setSidebarOpen(false)}
                 />
                 <aside className="sm:hidden absolute left-0 top-0 h-full w-[55vw] max-w-xs bg-stone-100 border-r border-stone-200 flex flex-col z-30 shadow-xl">
-                  <SidebarContent mobile />
+                  <SidebarContent {...sidebarProps} mobile />
                 </aside>
               </>
             )}
@@ -324,8 +341,8 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
                     <div className="text-[9px] tracking-widest uppercase text-neutral-400 mb-1.5">Categories</div>
                     {availableCategories.map((cat) => (
                       <div key={cat} className="flex items-center gap-1.5 py-0.5 text-[10px] text-neutral-700">
-                        <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: CATEGORY_COLORS[cat] }} />
-                        {CATEGORY_LABELS[cat]}
+                        <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: getCategoryColor(cat) }} />
+                        {categoryLabels[cat] ?? cat}
                       </div>
                     ))}
                   </div>
@@ -377,6 +394,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
               purchasedCollectionIds={purchasedCollectionIds}
               isAdmin={isAdmin}
               onSelectPlace={handleSelectPlaceFromList}
+              categoryLabels={categoryLabels}
             />
           </div>
         )}
@@ -388,6 +406,7 @@ export default function MapView({ places, collections, purchasedCollectionIds, i
           place={selectedPlace}
           isLocked={!isAdmin && !!selectedPlace.collection_id && !purchasedCollectionIds.includes(selectedPlace.collection_id)}
           onClose={handleClose}
+          categoryLabels={categoryLabels}
         />
       )}
     </div>

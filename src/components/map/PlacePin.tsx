@@ -1,19 +1,19 @@
 'use client'
 
-import type { PlaceCategory } from '@/types'
-
 interface PlacePinProps {
-  category: PlaceCategory
+  category: string
   isSelected: boolean
   isLocked: boolean
 }
 
-export const CATEGORY_COLORS: Record<PlaceCategory, string> = {
+export const CATEGORY_COLORS: Record<string, string> = {
   art_installation: '#d946ef',
   bridge: '#14b8a6',
   commercial: '#ef4444',
+  education: '#0ea5e9',
   landmark: '#f97316',
   landscape: '#84cc16',
+  library: '#eab308',
   museum: '#a855f7',
   office: '#1e40af',
   other: '#94a3b8',
@@ -22,8 +22,12 @@ export const CATEGORY_COLORS: Record<PlaceCategory, string> = {
   residential: '#10b981',
 }
 
+export function getCategoryColor(category: string): string {
+  return CATEGORY_COLORS[category] ?? '#94a3b8'
+}
+
 export default function PlacePin({ category, isSelected, isLocked }: PlacePinProps) {
-  const color = isLocked ? '#9ca3af' : CATEGORY_COLORS[category]
+  const color = isLocked ? '#9ca3af' : getCategoryColor(category)
   const r = isSelected ? 7 : 5
   const size = r * 2 + 4
 

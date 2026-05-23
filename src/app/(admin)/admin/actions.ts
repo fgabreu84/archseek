@@ -13,6 +13,24 @@ async function uploadToStorage(file: File, path: string): Promise<string> {
   return data.publicUrl
 }
 
+// ── Categories ─────────────────────────────────────────────────
+
+export async function createCategory(formData: FormData) {
+  const label = (formData.get('label') as string)?.trim()
+  if (!label) return
+  const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')
+  const supabase = await createClient()
+  const { error } = await supabase.from('categories').insert({ slug, label })
+  if (error) throw new Error(error.message)
+  revalidatePath('/admin/categories')
+}
+
+export async function deleteCategory(slug: string) {
+  const supabase = await createClient()
+  await supabase.from('categories').delete().eq('slug', slug)
+  revalidatePath('/admin/categories')
+}
+
 // ── Collections ────────────────────────────────────────────────
 
 export async function createCollection(formData: FormData) {
