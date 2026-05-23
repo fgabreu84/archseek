@@ -6,8 +6,8 @@ const josefin = Josefin_Sans({ subsets: ['latin'], weight: ['100'] })
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
-      <div className="text-center">
-        <div className="mb-12">
+      <div className="flex flex-col items-stretch">
+        <div className="mb-12 text-center">
           <span
             className={josefin.className}
             style={{ fontSize: '42px', fontWeight: 120, letterSpacing: '0.4em', textTransform: 'uppercase', whiteSpace: 'nowrap', marginRight: '-0.4em' }}
@@ -16,7 +16,7 @@ export default function HomePage() {
           </span>
         </div>
 
-        <div className="flex flex-col gap-3 w-72">
+        <div className="flex flex-col gap-3">
           <Link
             href="/register"
             className="bg-neutral-900 text-white text-xs tracking-widest uppercase px-4 py-3 hover:bg-neutral-700 transition-colors text-center"
